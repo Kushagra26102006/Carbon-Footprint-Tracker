@@ -111,7 +111,7 @@ const Analytics = () => {
         <div className="glass-card" style={{ textAlign: 'center', padding: '5rem 2rem', color: 'var(--slate-text-muted)' }}>
           <HelpCircle size={48} style={{ color: 'var(--primary-emerald)', marginBottom: '1.5rem' }} />
           <h2>No Data Available</h2>
-          <p style={{ marginTop: '0.5rem', maxWWidth: '450px', margin: '0.5rem auto' }}>
+          <p style={{ marginTop: '0.5rem', maxWidth: '450px', margin: '0.5rem auto' }}>
             We need logged activities to construct analytics graphs. Go to the log page to enter metrics.
           </p>
         </div>

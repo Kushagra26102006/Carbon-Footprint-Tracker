@@ -32,7 +32,7 @@ const Landing = () => {
     <div className="app-container" style={{ minHeight: '100vh', background: 'var(--bg-dark)' }}>
       {/* LANDING HEADER NAVIGATION */}
       <header style={{ borderBottom: '1px solid var(--glass-border)', background: 'var(--glass-surface)' }}>
-        <div style={{ maxWWidth: '1200px', margin: '0 auto', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-display)', fontWeight: '800', fontSize: '1.5rem' }}>
             <Leaf style={{ color: 'var(--primary-emerald)' }} />
             <span>Eco<span style={{ color: 'var(--primary-emerald)' }}>Track</span></span>
