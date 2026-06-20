@@ -1,10 +1,10 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext, useRef } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-// Render Backend URL
-const API_URL = 'https://carbon-footprint-tracker-wk54.onrender.com';
+// Use relative path to leverage Vite local dev proxy
+const API_URL = '';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,6 +12,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const logoutRef = useRef(null);
+
+  // Sync token to Axios default headers whenever it changes
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -21,6 +24,30 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('token');
     }
   }, [token]);
+
+  // Set up global axios interceptor to handle 401 errors dynamically
+  useEffect(() => {
+    logoutRef.current = logout;
+  });
+
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (err) => {
+        if (err.response && err.response.status === 401) {
+          console.warn('Unauthorized API access (401). Logging out...');
+          if (logoutRef.current) {
+            logoutRef.current();
+          }
+        }
+        return Promise.reject(err);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
 
   useEffect(() => {
     const bootstrapUser = async () => {
@@ -59,6 +86,10 @@ export const AuthProvider = ({ children }) => {
       );
 
       if (response.data.success) {
+        // Set token synchronously to avoid React state update race conditions
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        localStorage.setItem('token', response.data.token);
+
         setToken(response.data.token);
         setUser(response.data.user);
         return true;
@@ -88,6 +119,10 @@ export const AuthProvider = ({ children }) => {
       );
 
       if (response.data.success) {
+        // Set token synchronously to avoid React state update race conditions
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        localStorage.setItem('token', response.data.token);
+
         setToken(response.data.token);
         setUser(response.data.user);
         return true;
