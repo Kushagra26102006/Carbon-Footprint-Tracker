@@ -4,7 +4,9 @@ import axios from 'axios';
 const AuthContext = createContext(null);
 
 // Use relative path to leverage Vite local dev proxy
-const API_URL = '';
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://carbon-footprint-tracker-wk54.onrender.com';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
