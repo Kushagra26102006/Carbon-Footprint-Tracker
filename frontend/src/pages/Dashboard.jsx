@@ -31,13 +31,18 @@ const Dashboard = () => {
   const [error, setError] = useState('');
 
   // Fetch log history and analytics metrics
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const [logsRes, statsRes] = await Promise.all([
-        axios.get('/api/logs'),
-        axios.get('/api/logs/analytics')
-      ]);
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://carbon-footprint-tracker-wk54.onrender.com';
+
+const fetchDashboardData = async () => {
+  try {
+    setLoading(true);
+
+    const [logsRes, statsRes] = await Promise.all([
+      axios.get(`${API_URL}/api/logs`),
+      axios.get(`${API_URL}/api/logs/analytics`)
+    ]);
 
       if (logsRes.data.success) {
         setLogs(logsRes.data.data);
@@ -61,7 +66,9 @@ const Dashboard = () => {
   const handleDeleteLog = async (id) => {
     if (!window.confirm('Are you sure you want to delete this activity log?')) return;
     try {
-      const response = await axios.delete(`/api/logs/${id}`);
+      const response = await axios.delete(
+  `${API_URL}/api/logs/${id}`
+);
       if (response.data.success) {
         // Refresh local dashboard data
         fetchDashboardData();
