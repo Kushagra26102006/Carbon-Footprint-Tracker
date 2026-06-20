@@ -21,31 +21,37 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchAnalyticsData = async () => {
-      try {
-        setLoading(true);
-        const [logsRes, statsRes] = await Promise.all([
-          axios.get('/api/logs'),
-          axios.get('/api/logs/analytics')
-        ]);
+  const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://carbon-footprint-tracker-wk54.onrender.com';
 
-        if (logsRes.data.success) {
-          setLogs(logsRes.data.data);
-        }
-        if (statsRes.data.success) {
-          setStats(statsRes.data.data);
-        }
-      } catch (err) {
-        setError('Failed to query logs histories to compile graphs summary.');
-        console.error(err);
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true);
+
+      const [logsRes, statsRes] = await Promise.all([
+        axios.get(`${API_URL}/api/logs`),
+        axios.get(`${API_URL}/api/logs/analytics`)
+      ]);
+
+      if (logsRes.data.success) {
+        setLogs(logsRes.data.data);
       }
-    };
 
-    fetchAnalyticsData();
-  }, []);
+      if (statsRes.data.success) {
+        setStats(statsRes.data.data);
+      }
+    } catch (err) {
+      setError('Failed to query logs histories to compile graphs summary.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAnalyticsData();
+}, []);
 
   // Process data for category-wise Pie Chart
   const getPieChartData = () => {
