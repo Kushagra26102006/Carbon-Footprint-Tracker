@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Leaf, UserPlus, AlertCircle } from 'lucide-react';
 
 const Register = () => {
-  const { register, loading } = useAuth();
+  const { register, loading, token } = useAuth();
   const navigate = useNavigate();
   
   const [name, setName] = useState('');
@@ -14,6 +14,13 @@ const Register = () => {
   
   const [validationError, setValidationError] = useState('');
   const [apiError, setApiError] = useState('');
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +51,7 @@ const Register = () => {
     try {
       const success = await register(name, email, password);
       if (success) {
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (err) {
       setApiError(err.message || 'Registration failed. That account might already exist.');

@@ -1,9 +1,19 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { Leaf, Award, Globe, ShieldCheck, Flame, BarChart3, ChevronDown, ChevronUp, Users, Heart } from 'lucide-react';
 
 const Landing = () => {
+  const { token } = useAuth();
+  const navigate = useNavigate();
   const [activeFaq, setActiveFaq] = useState(null);
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [token, navigate]);
 
   const toggleFaq = (idx) => {
     setActiveFaq(activeFaq === idx ? null : idx);

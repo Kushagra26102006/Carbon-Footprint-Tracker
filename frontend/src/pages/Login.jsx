@@ -1,15 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Leaf, LogIn, AlertCircle } from 'lucide-react';
 
 const Login = () => {
-  const { login, loading } = useAuth();
+  const { login, loading, token } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validationError, setValidationError] = useState('');
   const [apiError, setApiError] = useState('');
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +37,7 @@ const Login = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (err) {
       setApiError(err.message || 'Login credentials incorrect. Please try again.');
