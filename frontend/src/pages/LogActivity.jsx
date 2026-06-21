@@ -126,7 +126,9 @@ const LogActivity = () => {
 
       setLoading(true);
 
-      const response = await axios.post('/api/logs', payload);
+  const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://carbon-footprint-tracker-wk54.onrender.com';
       if (response.data.success) {
         setSuccessMsg(`Successfully logged activity. Footprint: ${response.data.data.calculatedCarbon} kg CO2e.`);
         resetForm();
