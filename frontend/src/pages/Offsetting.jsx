@@ -2,29 +2,44 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Globe, Heart, Trees, AlertCircle, Compass, ArrowUpRight } from 'lucide-react';
 
-const Offsetting = () => {
-  const [stats, setStats] = useState({ totalCarbon: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://carbon-footprint-tracker-wk54.onrender.com';
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('/api/logs/analytics');
-        if (response.data.success) {
-          setStats(response.data.data);
+useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const token = localStorage.getItem('token');
+
+      const response = await axios.get(
+        `${API_URL}/api/logs/analytics`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (err) {
-        setError('Failed to pull statistics for offset configurations.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
-  }, []);
+      );
 
+      if (response.data.success) {
+        setStats(response.data.data);
+      }
+    } catch (err) {
+      console.error('Offset Analytics Error:', err);
+
+      setError(
+        err.response?.data?.message ||
+        'Failed to pull statistics for offset configurations.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchStats();
+}, []);
   // Compute offset equivalents
   const treesNeeded = Math.ceil(stats.totalCarbon / 22) || 0; // A tree absorbs ~22kg of CO2 per year
   const offsetCostDollars = (stats.totalCarbon / 1000) * 15; // Average $15 per ton of CO2 offset
