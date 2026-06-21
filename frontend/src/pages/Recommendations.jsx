@@ -8,30 +8,47 @@ const Recommendations = () => {
   const [error, setError] = useState('');
   const [source, setSource] = useState('cache');
 
-  const fetchRecommendations = async (bypassCache = false) => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      const endpoint = '/api/recommendations';
-      const response = await axios.get(endpoint);
+ const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://carbon-footprint-tracker-wk54.onrender.com';
 
-      if (response.data.success) {
-        setRecommendation(response.data.data.aiResponse);
-        setSource(response.data.source);
+const fetchRecommendations = async (bypassCache = false) => {
+  try {
+    setLoading(true);
+    setError('');
+
+    const token = localStorage.getItem('token');
+
+    const response = await axios.get(
+      `${API_URL}/api/recommendations`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    } catch (err) {
-      setError('Could not connect to the recommendation engine. Please check your network.');
-      console.error(err);
-    } finally {
-      setLoading(false);
+    );
+
+    if (response.data.success) {
+      setRecommendation(response.data.data.aiResponse);
+      setSource(response.data.source || 'live');
+    } else {
+      setError(response.data.message || 'Failed to fetch recommendations');
     }
-  };
+  } catch (err) {
+    console.error('Recommendation Error:', err);
 
-  useEffect(() => {
-    fetchRecommendations();
-  }, []);
+    setError(
+      err.response?.data?.message ||
+      'Could not connect to the recommendation engine.'
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
+useEffect(() => {
+  fetchRecommendations();
+}, []);
   // Simple clean markdown parser to convert standard markdown tags into styled HTML elements
   const renderMarkdown = (mdText) => {
     if (!mdText) return null;
